@@ -10,7 +10,7 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { ellipse, square, triangle } from 'ionicons/icons';
+import { cog , hourglass, home } from 'ionicons/icons';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -31,9 +31,8 @@ import '@ionic/react/css/display.css';
 import Home from './pages/Home';
 import History from './pages/History';
 import Settings from './pages/Settings';
-
+import Moelkky from './pages/Moelkky';
 setupIonicReact();
-
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
@@ -51,18 +50,21 @@ const App: React.FC = () => (
           <Route exact path="/">
             <Redirect to="/home" />
           </Route>
+          <Route path="/moelkky">
+           hello  
+          </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
           <IonTabButton tab="home" href="/home">
-            <IonIcon icon={triangle} />
+            <IonIcon icon={home} />
             <IonLabel>Home</IonLabel>
           </IonTabButton>
           <IonTabButton tab="history" href="/history">
-            <IonIcon icon={ellipse} />
+            <IonIcon icon={hourglass} />
             <IonLabel>History</IonLabel>
           </IonTabButton>
           <IonTabButton tab="settings" href="/settings">
-            <IonIcon icon={square} />
+            <IonIcon icon={cog} />
             <IonLabel>Settings</IonLabel>
           </IonTabButton>
         </IonTabBar>

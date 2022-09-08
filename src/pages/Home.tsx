@@ -1,8 +1,54 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonList,IonListHeader,IonChip,IonIcon, IonLabel, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import {IonGrid,IonCol,IonRow,IonButton} from "@ionic/react"; 
+import PlayerChip from "../components/PlayerChip"
+import {useRef,useState,useEffect} from "react";
+import {get,set} from "../utils/store";
+import {includes,without} from "lodash";
+import {add} from "ionicons/icons";
+import PlayerModal from "../components/PlayerModal"
+import {v4 as uuid} from "uuid"
+import {filter} from "lodash"
 
+export interface Player {
+  name: string;
+  color: string;
+  id: string;
+}
 const Home: React.FC = () => {
+ 
+  const [players,setPlayers] = useState<{name: string,id: string, color: string}[]>([]);
+  const [activePlayers,setActivePlayers] = useState<string[]>([]); 
+  useEffect(() => {
+    get("players").then((p: Player[]) => {
+      if(p && p.length){
+        setPlayers(p);
+      } 
+    }) 
+   
+  }, [])
+
+  const toggleActive = (id: string):void  => {
+    if(includes(activePlayers,id)){
+      setActivePlayers(without(activePlayers,id));
+    } else {
+      setActivePlayers([...activePlayers,id]);
+    }
+  }
+
+
+  const addPlayer = (name: string, color: string) => {
+    const id = uuid();
+    set("players", [...players,{name,color,id}]) 
+    setPlayers([...players, {name,color,id}])
+    
+  }
+
+  const removePlayer = (id: string) => {
+    const newPlayers = filter(players, (o: Player,i: number ) =>{ return o.id != id} );
+    setPlayers(newPlayers);
+    set("players", newPlayers);
+  }
   return (
     <IonPage>
       <IonHeader>
@@ -10,7 +56,18 @@ const Home: React.FC = () => {
           <IonTitle>GameScoring</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent>  
+      <IonContent> 
+      <IonGrid>
+      
+    
+        {players.map((p) => (<PlayerChip name={p.name} color={p.color} active={includes(activePlayers,p.id)} onClick={ () => toggleActive(p.id) } onDelete={() => removePlayer(p.id)} />) 
+       ) }
+      
+      <IonChip id="open-player-modal">
+        <IonIcon icon={add} style={{margin:0}}></IonIcon>
+      </IonChip>
+
+      </IonGrid>
       <IonGrid>
         <IonRow>
           <IonCol size="6">
@@ -27,6 +84,7 @@ const Home: React.FC = () => {
           <IonCol></IonCol>
         </IonRow>
       </IonGrid>
+      <PlayerModal onConfirm={addPlayer}/>
       </IonContent> 	
     </IonPage>
   );
