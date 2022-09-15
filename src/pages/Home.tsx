@@ -13,14 +13,14 @@ import {
 import ExploreContainer from "../components/ExploreContainer";
 import { IonGrid, IonCol, IonRow, IonButton } from "@ionic/react";
 import PlayerChip from "../components/PlayerChip";
-import { useRef, useState, useEffect } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { get, set } from "../utils/store";
 import { includes, without } from "lodash";
 import { add } from "ionicons/icons";
 import PlayerModal from "../components/PlayerModal";
 import { v4 as uuid } from "uuid";
 import { filter } from "lodash";
-
+import { GameContext } from "../providers/GameProvider";
 export interface Player {
   name: string;
   color: string;
@@ -31,6 +31,9 @@ const Home: React.FC = () => {
     { name: string; id: string; color: string }[]
   >([]);
   const [activePlayers, setActivePlayers] = useState<string[]>([]);
+
+  const game = useContext(GameContext);
+
   useEffect(() => {
     get("players").then((p: Player[]) => {
       if (p && p.length) {
@@ -46,7 +49,11 @@ const Home: React.FC = () => {
       setActivePlayers([...activePlayers, id]);
     }
   };
-
+  useEffect(() => {
+    game.setPlayers(
+      filter(players, (p: Player) => activePlayers.includes(p.id))
+    );
+  }, [activePlayers]);
   const addPlayer = (name: string, color: string) => {
     const id = uuid();
     set("players", [...players, { name, color, id }]);

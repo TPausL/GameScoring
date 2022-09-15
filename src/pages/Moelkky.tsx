@@ -5,7 +5,12 @@ import {
   IonToolbar,
   IonTitle,
 } from "@ionic/react";
+import { useContext } from "react";
+import { GameContext } from "../providers/GameProvider";
+
 export default function Moelkky() {
+  const game = useContext(GameContext);
+
   return (
     <IonPage>
       <IonHeader>
@@ -13,7 +18,11 @@ export default function Moelkky() {
           <IonTitle>Moelkky</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent></IonContent>
+      <IonContent>
+        {game.players.map((p) => (
+          <div>{p.name}</div>
+        ))}
+      </IonContent>
     </IonPage>
   );
 }
