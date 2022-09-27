@@ -4,14 +4,16 @@ import { map, extend } from "lodash";
 
 export interface ActivePlayer extends Player {
   points: number;
+  negativePoints: number;
 }
 
 export type GameContextType = {
   setPlayers: (ps: Player[]) => void;
-  players: Player[];
+  players: ActivePlayer[];
   setPoints: (p: ActivePlayer, n: number) => void;
   addPoints: (p: ActivePlayer, n: number) => void;
   subPoints: (p: ActivePlayer, n: number) => void;
+  reset: () => void;
 };
 export const GameContext = createContext<GameContextType>({
   setPlayers: () => undefined,
@@ -19,6 +21,7 @@ export const GameContext = createContext<GameContextType>({
   setPoints: () => undefined,
   addPoints: () => undefined,
   subPoints: () => undefined,
+  reset: () => undefined,
 });
 
 export default function GameContextProvider({
@@ -29,7 +32,9 @@ export default function GameContextProvider({
   const [players, setActivePlayers] = useState<ActivePlayer[]>([]);
 
   const setPlayers = (ps: Player[]) => {
-    setActivePlayers(map(ps, (p: Player) => extend({ points: 0 }, p)));
+    setActivePlayers(
+      map(ps, (p: Player) => extend({ points: 0, negativePoints: 0 }, p))
+    );
   };
 
   const setPoints = (player: ActivePlayer, n: number) => {
@@ -55,9 +60,13 @@ export default function GameContextProvider({
     );
   };
 
+  const reset = () => {
+    setPlayers(players.map((p) => ({ ...p, points: 0, negativePoints: 0 })));
+  };
+
   return (
     <GameContext.Provider
-      value={{ setPlayers, players, setPoints, addPoints, subPoints }}
+      value={{ setPlayers, players, setPoints, addPoints, subPoints, reset }}
     >
       {children}
     </GameContext.Provider>
