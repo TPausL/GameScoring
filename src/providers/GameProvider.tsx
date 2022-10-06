@@ -1,27 +1,25 @@
-import { createContext, useState } from "react";
-import { Player } from "../pages/Home";
-import { map, extend } from "lodash";
-
-export interface ActivePlayer extends Player {
-  points: number;
-  negativePoints: number;
-}
+import { createContext, useRef, useState } from "react";
+import { Player as RawPlayer } from "../pages/Home";
+import { map, filter, forEach } from "lodash";
+import Player from "./Player";
 
 export type GameContextType = {
-  setPlayers: (ps: Player[]) => void;
-  players: ActivePlayer[];
-  setPoints: (p: ActivePlayer, n: number) => void;
-  addPoints: (p: ActivePlayer, n: number) => void;
-  subPoints: (p: ActivePlayer, n: number) => void;
+  setPlayers: (ps: RawPlayer[]) => void;
+  players: Player[];
   reset: () => void;
+  lostPlayers: Player[];
+  playerLost: (p: Player) => void;
+  wonPlayers: Player[];
+  playerWon: (p: Player) => void;
 };
 export const GameContext = createContext<GameContextType>({
   setPlayers: () => undefined,
   players: [],
-  setPoints: () => undefined,
-  addPoints: () => undefined,
-  subPoints: () => undefined,
   reset: () => undefined,
+  lostPlayers: [],
+  playerLost: () => undefined,
+  wonPlayers: [],
+  playerWon: () => undefined,
 });
 
 export default function GameContextProvider({
@@ -29,44 +27,58 @@ export default function GameContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [players, setActivePlayers] = useState<ActivePlayer[]>([]);
+  const [activePlayers, setActivePlayers] = useState<Player[]>([]);
+  const [lostPlayers, setLostPlayers] = useState<Player[]>([]);
+  const [wonPlayers, setWonPlayers] = useState<Player[]>([]);
 
-  const setPlayers = (ps: Player[]) => {
-    setActivePlayers(
-      map(ps, (p: Player) => extend({ points: 0, negativePoints: 0 }, p))
-    );
-  };
+  const sortedIds = useRef<string[]>([]);
 
-  const setPoints = (player: ActivePlayer, n: number) => {
+  const setPlayers = (ps: RawPlayer[]) => {
     setActivePlayers(
-      players.map((p: ActivePlayer) =>
-        player.id === p.id ? { ...p, points: n } : p
-      )
-    );
-  };
-
-  const addPoints = (player: ActivePlayer, n: number) => {
-    setActivePlayers(
-      players.map((p: ActivePlayer) =>
-        player.id === p.id ? { ...p, points: p.points + n } : p
-      )
-    );
-  };
-  const subPoints = (player: ActivePlayer, n: number) => {
-    setActivePlayers(
-      players.map((p: ActivePlayer) =>
-        player.id === p.id ? { ...p, points: p.points - n } : p
-      )
+      map(ps, (p: RawPlayer) => {
+        sortedIds.current = [...sortedIds.current, p.id];
+        return new Player(p);
+      })
     );
   };
 
   const reset = () => {
-    setPlayers(players.map((p) => ({ ...p, points: 0, negativePoints: 0 })));
+    console.log(activePlayers, wonPlayers, lostPlayers);
+    const ps = [...activePlayers, ...wonPlayers, ...lostPlayers];
+    console.log(ps);
+    setWonPlayers([]);
+    setLostPlayers([]);
+    forEach(ps, (p) => p.reset());
+    ps.sort(
+      (a, b) =>
+        sortedIds.current.indexOf(a.id) - sortedIds.current.indexOf(b.id)
+    );
+    console.log(ps);
+    setPlayers(ps);
+  };
+
+  const playerLost = (p: Player) => {
+    console.log(lostPlayers);
+    setActivePlayers(filter(activePlayers, (pl: Player) => p.id !== pl.id));
+    setLostPlayers([...lostPlayers, p]);
+  };
+
+  const playerWon = (p: Player) => {
+    setActivePlayers(filter(activePlayers, (pl: Player) => p.id !== pl.id));
+    setWonPlayers([...wonPlayers, p]);
   };
 
   return (
     <GameContext.Provider
-      value={{ setPlayers, players, setPoints, addPoints, subPoints, reset }}
+      value={{
+        setPlayers,
+        players: activePlayers,
+        reset,
+        lostPlayers,
+        playerLost,
+        wonPlayers,
+        playerWon,
+      }}
     >
       {children}
     </GameContext.Provider>

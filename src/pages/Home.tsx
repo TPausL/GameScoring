@@ -21,6 +21,8 @@ import PlayerModal from "../components/PlayerModal";
 import { v4 as uuid } from "uuid";
 import { filter } from "lodash";
 import { GameContext } from "../providers/GameProvider";
+import { Box, Button, Grid, Main, Text } from "grommet";
+import { Add } from "grommet-icons";
 export interface Player {
   name: string;
   color: string;
@@ -33,6 +35,8 @@ const Home: React.FC = () => {
   const [activePlayers, setActivePlayers] = useState<string[]>([]);
 
   const game = useContext(GameContext);
+
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     get("players").then((p: Player[]) => {
@@ -67,52 +71,56 @@ const Home: React.FC = () => {
     setPlayers(newPlayers);
     set("players", newPlayers);
   };
+  console.log("home");
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>GameScoring</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent>
-        <IonGrid>
-          {players.map((p) => (
-            <PlayerChip
-              name={p.name}
-              color={p.color}
-              active={includes(activePlayers, p.id)}
-              onClick={() => toggleActive(p.id)}
-              onDelete={() => removePlayer(p.id)}
-            />
-          ))}
-
-          <IonChip id="open-player-modal">
-            <IonIcon icon={add} style={{ margin: 0 }}></IonIcon>
-          </IonChip>
-        </IonGrid>
-        <IonGrid>
-          <IonRow>
-            <IonCol size="6">
-              <IonButton
-                routerLink="/games/moelkky"
-                style={{ height: "10vh" }}
-                expand="block"
-              >
-                Moelkky
-              </IonButton>
-            </IonCol>
-            <IonCol size="6">
-              <IonButton>6 Nimmt</IonButton>
-            </IonCol>
-          </IonRow>
-          <IonRow>
-            <IonCol></IonCol>
-            <IonCol></IonCol>
-          </IonRow>
-        </IonGrid>
-        <PlayerModal onConfirm={addPlayer} />
-      </IonContent>
-    </IonPage>
+    <Main background="background-back" height="100%">
+      <Text margin={{ left: "8px", top: "12px" }}> Players </Text>
+      <Box direction="row" margin={{ top: "8px", left: "4px" }} wrap>
+        {players.map((p) => (
+          <PlayerChip
+            key={p.id}
+            name={p.name}
+            color={p.color}
+            active={includes(activePlayers, p.id)}
+            onClick={() => toggleActive(p.id)}
+            onDelete={() => removePlayer(p.id)}
+          />
+        ))}
+        <Button
+          onClick={() => setModalOpen(true)}
+          primary
+          color="#aaa"
+          style={{ height: 38, padding: 8, margin: 4 }}
+        >
+          <Add />
+        </Button>
+      </Box>
+      <IonGrid>
+        <IonRow>
+          <IonCol size="6">
+            <IonButton
+              routerLink="/games/moelkky"
+              style={{ height: "10vh" }}
+              expand="block"
+            >
+              Moelkky
+            </IonButton>
+          </IonCol>
+          <IonCol size="6">
+            <IonButton>6 Nimmt</IonButton>
+          </IonCol>
+        </IonRow>
+        <IonRow>
+          <IonCol></IonCol>
+          <IonCol></IonCol>
+        </IonRow>
+      </IonGrid>
+      <PlayerModal
+        isOpen={modalOpen}
+        onConfirm={addPlayer}
+        onClose={() => setModalOpen(false)}
+      />
+    </Main>
   );
 };
 

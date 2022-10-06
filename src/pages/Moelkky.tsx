@@ -10,20 +10,30 @@ import {
   IonButton,
 } from "@ionic/react";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { ActivePlayer, GameContext } from "../providers/GameProvider";
+import { GameContext } from "../providers/GameProvider";
+import Player from "../providers/Player";
 import PlayerSlide from "../components/PlayerSlide";
 import Carousel from "nuka-carousel";
 
 import "./slider.css";
+import { wait } from "@testing-library/react";
+import WinModal from "../components/WinModal";
 
 export default function Moelkky() {
   const game = useContext(GameContext);
-  const [ap, setAp] = useState<ActivePlayer>(game.players[0]);
+  const [ap, setAp] = useState<Player>(game.players[0]);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const [index, setIndex] = useState<number>(0);
   useEffect(() => {
     setAp(game.players[index]);
   }, [index]);
+
+  useEffect(() => {
+    if (game.players.length <= 1) {
+      setModalOpen(true);
+    }
+  }, [game.players]);
   return (
     <IonPage>
       <IonHeader>
@@ -62,7 +72,11 @@ export default function Moelkky() {
               afterSlide={(d) => setIndex(d)}
             >
               {game.players.map((p) => (
-                <PlayerSlide player={p} />
+                <PlayerSlide
+                  next={() => setIndex((index + 1) % game.players.length)}
+                  key={p.id}
+                  player={p}
+                />
               ))}
             </Carousel>
           </div>
@@ -91,12 +105,11 @@ export default function Moelkky() {
                         <IonCol key={`ionCol${i + 1 * j + 1}`}>
                           <IonButton
                             onClick={() => {
-                              game.addPoints(ap, i * 4 + 1 + j);
-                              setTimeout(
-                                () =>
-                                  setIndex((index + 1) % game.players.length),
-                                500
-                              );
+                              ap.addPoints(4 * i + 1 + j);
+                              if (ap.points > 50) {
+                                ap.points = 25;
+                              }
+                              setIndex((index + 1) % game.players.length);
                             }}
                             key={`ionButton${i + 1 * j + 1}`}
                             style={{ width: "100%", height: "100%" }}
@@ -112,6 +125,7 @@ export default function Moelkky() {
             </IonGrid>
           </div>
         </div>
+        <WinModal open={modalOpen} />
       </IonContent>
     </IonPage>
   );

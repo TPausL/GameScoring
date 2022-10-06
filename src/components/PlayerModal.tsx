@@ -10,62 +10,95 @@ import {
   IonButton,
   IonTitle,
 } from "@ionic/react";
-import { useState, useRef } from "react";
+import { Box, Button, FormField, Header, Text, TextInput } from "grommet";
+import { rest } from "lodash";
+import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
-
+import { BottomSheet } from "react-spring-bottom-sheet";
+import tinycolor from "tinycolor2";
 export default function PlayerModal({
+  isOpen,
   onConfirm,
+  onClose,
 }: {
+  isOpen: boolean;
   onConfirm: (name: string, color: string) => void;
+  onClose: () => void;
 }) {
-  const modal = useRef<HTMLIonModalElement>(null);
-
+  const [open, setOpen] = useState(false);
   const [name, setName] = useState<string>("");
-  const [color, setColor] = useState<string>("#c650aa");
+  const [color, setColor] = useState<string>(tinycolor.random().toHexString());
+
+  useEffect(() => {
+    setOpen(isOpen);
+  }, [isOpen]);
 
   function confirm() {
     onConfirm(name, color);
-    modal.current?.dismiss({ name, color }, "confirm");
+    reset();
   }
 
+  function reset() {
+    setOpen(false);
+    setTimeout(() => {
+      setName("");
+      setColor(tinycolor.random().toHexString());
+    }, 500);
+  }
+
+  useEffect(() => {
+    if (!open) onClose();
+  }, [open]);
+
   return (
-    <IonModal
-      onDidDismiss={() => {
-        setName("");
-        setColor("#c650aa");
+    <BottomSheet
+      onKeyDown={(e) => {
+        if (e.key == "Enter") confirm();
       }}
-      ref={modal}
-      trigger="open-player-modal"
-      breakpoints={[0, 0.6, 0.8]}
-      initialBreakpoint={0.4}
+      open={open}
+      onDismiss={reset}
+      snapPoints={(p) => [p.minHeight]}
+      style={{ backgroundColor: "#fce7ae" }}
+      header={
+        <Header>
+          <Button
+            style={{ padding: 4 }}
+            color="status-critical"
+            focusIndicator={false}
+            onClick={reset}
+          >
+            <Text>Cancel</Text>
+          </Button>
+          <Button
+            onClick={confirm}
+            focusIndicator={false}
+            style={{ padding: 4 }}
+            color="status-ok"
+          >
+            <Text>Save</Text>
+          </Button>
+        </Header>
+      }
     >
-      <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonButton onClick={() => modal.current?.dismiss()}>
-              Cancel
-            </IonButton>
-          </IonButtons>
-          <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => confirm()}>
-              Confirm
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding">
-        <IonInput
+      <Box pad="small" background="background">
+        <TextInput
+          style={{ border: "none", boxShadow: "none" }}
+          focusIndicator={false}
           value={name}
-          onIonChange={(e) => setName(e.detail.value!)}
+          onChange={(e) => setName(e.target.value!)}
           placeholder="Name..."
-        ></IonInput>
+        ></TextInput>
 
         <HexColorPicker
-          style={{ marginTop: 8, width: "100%", height: "25%" }}
+          style={{
+            marginTop: 8,
+            width: "100%",
+            height: 300,
+          }}
           color={color}
           onChange={setColor}
         />
-      </IonContent>
-    </IonModal>
+      </Box>
+    </BottomSheet>
   );
 }

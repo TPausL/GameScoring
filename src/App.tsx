@@ -1,17 +1,4 @@
-import { Redirect, Route } from "react-router-dom";
-import {
-  IonApp,
-  IonIcon,
-  IonLabel,
-  IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-  setupIonicReact,
-} from "@ionic/react";
-import { IonReactRouter } from "@ionic/react-router";
-import { cog, hourglass, home } from "ionicons/icons";
-
+import { IonPage, setupIonicReact } from "@ionic/react";
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 /* Basic CSS for apps built with Ionic */
@@ -27,53 +14,68 @@ import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/display.css";
 import Home from "./pages/Home";
-import Main from "./pages/Main";
 import History from "./pages/History";
 import Settings from "./pages/Settings";
 import Moelkky from "./pages/Moelkky";
 import GameContextProvider from "./providers/GameProvider";
+import { Grommet, Nav } from "grommet";
+import { Configure, HomeRounded, History as HistoryIcon } from "grommet-icons";
+import theme from "./theme";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Navigate } from "react-router";
+import { Link } from "react-router-dom";
+import TabIcon from "./components/TabIcon";
+import Header from "./components/Header";
+import "./App.css";
+import "react-spring-bottom-sheet/dist/style.css";
+
 setupIonicReact();
 const App: React.FC = () => (
-  <IonApp>
+  <Grommet plain theme={theme} style={{ fontFamily: "Asap" }}>
     <GameContextProvider>
-      <IonReactRouter>
-        <IonTabs>
-          <IonRouterOutlet>
-            <Route exact path="/games">
-              <Home />
-            </Route>
-            <Route path="/games/moelkky">
-              <Moelkky />
-            </Route>
-
-            <Route path="/history">
-              <History />
-            </Route>
-            <Route path="/settings">
-              <Settings />
-            </Route>
-            <Route exact path="/">
-              <Redirect to="/games" />
-            </Route>
-          </IonRouterOutlet>
-          <IonTabBar slot="bottom">
-            <IonTabButton tab="games" href="/games">
-              <IonIcon icon={home} />
-              <IonLabel>Home</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="history" href="/history">
-              <IonIcon icon={hourglass} />
-              <IonLabel>History</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="settings" href="/settings">
-              <IonIcon icon={cog} />
-              <IonLabel>Settings</IonLabel>
-            </IonTabButton>
-          </IonTabBar>
-        </IonTabs>
-      </IonReactRouter>
+      <IonPage>
+        <BrowserRouter>
+          <Header />
+          <div
+            style={{
+              height: "100%",
+              overflow: "scroll",
+              marginBottom: 72,
+              marginTop: 64,
+            }}
+          >
+            <Routes>
+              <Route
+                path="games*"
+                element={
+                  <>
+                    <Routes>
+                      <Route path="" element={<Home />} />
+                      <Route path="moelkky" element={<Moelkky />} />
+                    </Routes>
+                  </>
+                }
+              />
+              <Route path="history*" element={<History />} />
+              <Route path="settings*" element={<Settings />} />
+              <Route path="/" element={<Navigate to="/games" replace />} />
+            </Routes>
+          </div>
+          <Nav
+            justify="evenly"
+            style={{ position: "fixed", bottom: 0, width: "100%" }}
+            direction="row"
+            background="brand"
+            pad="medium"
+          >
+            <TabIcon icon={HomeRounded} label="Home" link="/games" />
+            <TabIcon icon={HistoryIcon} label="History" link="/history" />
+            <TabIcon icon={Configure} label="Settings" link="/settings" />
+          </Nav>
+        </BrowserRouter>
+      </IonPage>
     </GameContextProvider>
-  </IonApp>
+  </Grommet>
 );
 
 export default App;
