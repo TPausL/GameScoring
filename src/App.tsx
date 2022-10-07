@@ -28,6 +28,7 @@ import TabIcon from "./components/TabIcon";
 import Header from "./components/Header";
 import "./App.css";
 import "react-spring-bottom-sheet/dist/style.css";
+import Tabs from "./components/Tabs";
 
 setupIonicReact();
 const App: React.FC = () => (
@@ -61,17 +62,7 @@ const App: React.FC = () => (
               <Route path="/" element={<Navigate to="/games" replace />} />
             </Routes>
           </div>
-          <Nav
-            justify="evenly"
-            style={{ position: "fixed", bottom: 0, width: "100%" }}
-            direction="row"
-            background="brand"
-            pad="medium"
-          >
-            <TabIcon icon={HomeRounded} label="Home" link="/games" />
-            <TabIcon icon={HistoryIcon} label="History" link="/history" />
-            <TabIcon icon={Configure} label="Settings" link="/settings" />
-          </Nav>
+          <Tabs />
         </BrowserRouter>
       </IonPage>
     </GameContextProvider>

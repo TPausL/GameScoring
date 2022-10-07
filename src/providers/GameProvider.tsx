@@ -1,11 +1,22 @@
-import { createContext, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { Player as RawPlayer } from "../pages/Home";
-import { map, filter, forEach } from "lodash";
+import { map, filter, forEach, remove } from "lodash";
 import Player from "./Player";
+import { play } from "ionicons/icons";
+
+export enum PA {
+  addP,
+  addN,
+  subP,
+  subN,
+  setP,
+  setN,
+}
 
 export type GameContextType = {
   setPlayers: (ps: RawPlayer[]) => void;
   players: Player[];
+  points: (player: Player, action: PA, p: number) => void;
   reset: () => void;
   lostPlayers: Player[];
   playerLost: (p: Player) => void;
@@ -20,6 +31,7 @@ export const GameContext = createContext<GameContextType>({
   playerLost: () => undefined,
   wonPlayers: [],
   playerWon: () => undefined,
+  points: () => undefined,
 });
 
 export default function GameContextProvider({
@@ -31,7 +43,17 @@ export default function GameContextProvider({
   const [lostPlayers, setLostPlayers] = useState<Player[]>([]);
   const [wonPlayers, setWonPlayers] = useState<Player[]>([]);
 
+  const [curPlayer, setCurPlayer] = useState<Player>(
+    undefined as unknown as Player
+  );
+
   const sortedIds = useRef<string[]>([]);
+
+  useEffect(() => {
+    if (!curPlayer && activePlayers.length) {
+      setCurPlayer(activePlayers[0]);
+    }
+  }, [activePlayers]);
 
   const setPlayers = (ps: RawPlayer[]) => {
     setActivePlayers(
@@ -53,8 +75,39 @@ export default function GameContextProvider({
       (a, b) =>
         sortedIds.current.indexOf(a.id) - sortedIds.current.indexOf(b.id)
     );
-    console.log(ps);
+    setCurPlayer(ps[0]);
     setPlayers(ps);
+  };
+
+  const points = (player: Player, action: PA, points: number) => {
+    console.log(activePlayers.indexOf(player));
+    if (activePlayers.indexOf(player) < 0) return;
+    switch (action) {
+      case PA.setP:
+        player.points = points;
+        break;
+      case PA.subP:
+        player.points -= points;
+        break;
+      case PA.addP:
+        player.points += points;
+        break;
+      case PA.setN:
+        player.negativePoints = points;
+        break;
+      case PA.subN:
+        player.negativePoints -= points;
+        break;
+      case PA.addN:
+        player.negativePoints += points;
+        break;
+    }
+
+    const index = activePlayers.indexOf(player);
+
+    const newPlayers = [...filter(activePlayers, (p) => p.id !== player.id)];
+    newPlayers.splice(index, 0, player);
+    setActivePlayers(newPlayers);
   };
 
   const playerLost = (p: Player) => {
@@ -78,6 +131,7 @@ export default function GameContextProvider({
         playerLost,
         wonPlayers,
         playerWon,
+        points,
       }}
     >
       {children}

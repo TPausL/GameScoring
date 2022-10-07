@@ -11,17 +11,21 @@ const theme = {
         dark: "#E9C46A",
         light: "#2A9D8F",
       },
+      secondary: {
+        dark: "#BF1363",
+        light: "#BF1363",
+      },
       background: {
         dark: "#1f7368",
-        light: "#fce7ae",
+        light: "#EFE7DD",
       },
       "background-back": {
         dark: "#1f7368",
-        light: "#fce7ae",
+        light: "#EFE7DD",
       },
       "background-front": {
         dark: "#2A9D8F",
-        light: "#f5db98",
+        light: "#f5e6d3",
       },
       "background-contrast": {
         dark: "#FFFFFF11",

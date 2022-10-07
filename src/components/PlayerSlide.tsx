@@ -3,6 +3,8 @@ import { IonButton, IonCol, IonGrid, IonRow, IonText } from "@ionic/react";
 import { useContext } from "react";
 import Player from "../providers/Player";
 import { nextTick } from "process";
+import { play } from "ionicons/icons";
+import tinycolor from "tinycolor2";
 export interface PlayerSlideProps {
   children?: React.ReactNode;
   player: Player;
@@ -18,10 +20,11 @@ export default function PlayerSlide({
   return (
     <div
       style={{
-        height: "100%",
+        height: "calc(100% - 32px)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        background: tinycolor(player.color).setAlpha(0.7).toHex8String(),
       }}
     >
       <h1 style={{ width: "100%", textAlign: "center", fontWeight: "normal" }}>
@@ -30,24 +33,6 @@ export default function PlayerSlide({
       <p style={{ fontSize: 60, fontWeight: "bold", margin: 0 }}>
         {player.points}
       </p>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        Failed Attempts:
-        {Array(player.negativePoints)
-          .fill("I")
-          .map((o) => o)}
-        <IonButton
-          onClick={() => {
-            player.addNegativePoints(1);
-            if (player.negativePoints > 2) {
-              game.playerLost(player);
-            } else {
-              next();
-            }
-          }}
-        >
-          +
-        </IonButton>
-      </div>
     </div>
   );
 }

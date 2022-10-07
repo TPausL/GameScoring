@@ -22,7 +22,10 @@ import { v4 as uuid } from "uuid";
 import { filter } from "lodash";
 import { GameContext } from "../providers/GameProvider";
 import { Box, Button, Grid, Main, Text } from "grommet";
-import { Add } from "grommet-icons";
+import { Add, Gamepad, Group, LocationPin } from "grommet-icons";
+import { Divider } from "@react-md/divider";
+import tinycolor from "tinycolor2";
+import GameCard from "../components/GameCard";
 export interface Player {
   name: string;
   color: string;
@@ -71,11 +74,24 @@ const Home: React.FC = () => {
     setPlayers(newPlayers);
     set("players", newPlayers);
   };
-  console.log("home");
   return (
-    <Main background="background-back" height="100%">
-      <Text margin={{ left: "8px", top: "12px" }}> Players </Text>
-      <Box direction="row" margin={{ top: "8px", left: "4px" }} wrap>
+    <Main
+      background="background-back"
+      height="100%"
+      style={{ display: "block" }}
+    >
+      <Box
+        direction="row"
+        justify="start"
+        align="center"
+        margin={{ left: "large", top: "medium" }}
+      >
+        <Group />
+        <Text color="text-xweak" margin={{ left: "xsmall" }}>
+          Players
+        </Text>
+      </Box>
+      <Box direction="row" margin={{ top: "8px", left: "12px" }} wrap>
         {players.map((p) => (
           <PlayerChip
             key={p.id}
@@ -95,26 +111,39 @@ const Home: React.FC = () => {
           <Add />
         </Button>
       </Box>
-      <IonGrid>
-        <IonRow>
-          <IonCol size="6">
-            <IonButton
-              routerLink="/games/moelkky"
-              style={{ height: "10vh" }}
-              expand="block"
-            >
-              Moelkky
-            </IonButton>
-          </IonCol>
-          <IonCol size="6">
-            <IonButton>6 Nimmt</IonButton>
-          </IonCol>
-        </IonRow>
-        <IonRow>
-          <IonCol></IonCol>
-          <IonCol></IonCol>
-        </IonRow>
-      </IonGrid>
+      <div
+        style={{
+          backgroundColor: tinycolor("grey").setAlpha(0.4).toHex8String(),
+          height: 1,
+          width: "calc(100% - 16px)",
+          margin: 8,
+        }}
+      ></div>
+      <Box
+        direction="row"
+        justify="start"
+        align="center"
+        margin={{ left: "large", top: "medium" }}
+      >
+        <Gamepad />
+        <Text color="text-xweak" margin={{ left: "xsmall" }}>
+          Games
+        </Text>
+      </Box>
+      <Box wrap width="100%" direction="row" justify="center">
+        <GameCard
+          desc="Throw pin at other pins"
+          name="Moelkky"
+          icon={LocationPin}
+          link="moelkky"
+        />
+        <GameCard
+          desc="Throw pin at othe"
+          name="Moelkky"
+          icon={LocationPin}
+          link="moelkky"
+        />
+      </Box>
       <PlayerModal
         isOpen={modalOpen}
         onConfirm={addPlayer}

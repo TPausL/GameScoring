@@ -1,4 +1,4 @@
-import { Header, Heading } from "grommet";
+import { Box, Header, Heading } from "grommet";
 import { compact } from "lodash";
 import { useLocation, useNavigation } from "react-router";
 
@@ -8,8 +8,8 @@ export default function CustomHeader() {
   const getText = (path: string) => {
     const arr = compact(path.split("/"));
     console.log(arr);
-    if (arr[0] == "games") {
-      if (arr[1] == "moelkky") {
+    if (arr[0] === "games") {
+      if (arr[1] === "moelkky") {
         return "Moellky";
       } else {
         return "Home";
@@ -25,6 +25,17 @@ export default function CustomHeader() {
       <Heading margin="small" level={2}>
         {getText(location.pathname)}
       </Heading>
+      <Box
+        background="background-front"
+        style={{
+          position: "absolute",
+          height: 120,
+          width: 120,
+          right: 0,
+          zIndex: 100,
+          transform: "rotate(32deg) translate(40px, -30px)",
+        }}
+      ></Box>
     </Header>
   );
 }

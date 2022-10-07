@@ -28,7 +28,7 @@ const PlayerChip: React.FC<{
         borderRadius: 25,
         margin: 4,
         padding: 8,
-        background: tinycolor(color).setAlpha(0.3).toHex8String(),
+        background: tinycolor(color).setAlpha(0.6).toHex8String(),
         color: tinycolor(color).darken(10).toHex8String(),
         fontWeight: active ? "800" : "400",
       }}

@@ -20,7 +20,7 @@ export default function TabIcon({
           style={{
             position: "relative",
             transition: ".1s ease-in-out",
-            transform: isActive ? "translateY(-15px)" : "unset",
+            transform: isActive ? "translateY(-2.5vh)" : "unset",
           }}
         >
           <rest.icon />
