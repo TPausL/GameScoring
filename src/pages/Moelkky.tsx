@@ -17,10 +17,10 @@ import Carousel from "nuka-carousel";
 
 import "./slider.css";
 import WinModal from "../components/WinModal";
-import { Box, Button, Grid, Main } from "grommet";
+import { Box, Button, Grid, Main, Text } from "grommet";
 import { range } from "lodash";
 import tinycolor from "tinycolor2";
-import { Edit, FormNext, FormPrevious, Launch } from "grommet-icons";
+import { Edit, FormNext, FormPrevious, Launch, Next } from "grommet-icons";
 
 export default function Moelkky() {
   const game = useContext(GameContext);
@@ -39,43 +39,47 @@ export default function Moelkky() {
   }, [game.players]);
   return (
     <>
-      <Main background="background" justify="between">
+      <Main
+        background="background"
+        justify="between"
+        style={{ position: "relative" }}
+      >
         <Carousel
           slideIndex={index}
           wrapAround
           style={{ paddingBottom: 32, height: "100%" }}
-          defaultControlsConfig={{
-            nextButtonText: "›",
-            nextButtonStyle: {
-              background: "transparent",
-              fontSize: 50,
-              color: "black",
-            },
-            prevButtonText: "‹",
-            prevButtonStyle: {
-              background: "transparent",
-              fontSize: 50,
-              color: "black",
-            },
-          }}
           renderCenterLeftControls={(props) => (
-            <FormPrevious
-              style={{ cursor: "pointer" }}
-              size="32px"
-              onClick={() =>
-                props.goToSlide((props.currentSlide - 1) % props.slideCount)
-              }
-            />
+            <Box
+              justify="around"
+              style={{
+                height: "calc(100% - 64px)",
+                zIndex: 100,
+                position: "absolute",
+                top: 0,
+                left: 8,
+              }}
+            >
+              <Box direction="row" align="center">
+                <Text color="text-weak" size="large">
+                  2
+                </Text>
+                <Next color="text-weak" />
+              </Box>
+              <Box direction="row" align="center">
+                <Text color="text-weak" size="large">
+                  1
+                </Text>
+                <Next color="text-weak" />
+              </Box>
+              <Box direction="row" align="center">
+                <Text color="text-weak" size="large">
+                  0
+                </Text>
+                <Next color="text-weak" />
+              </Box>
+            </Box>
           )}
-          renderCenterRightControls={(props) => (
-            <FormNext
-              style={{ cursor: "pointer" }}
-              size="32px"
-              onClick={() =>
-                props.goToSlide((props.currentSlide + 1) % props.slideCount)
-              }
-            />
-          )}
+          renderCenterRightControls={() => <></>}
           afterSlide={(d) => setIndex(d)}
         >
           {game.players.map((p) => (
@@ -98,6 +102,17 @@ export default function Moelkky() {
             align="end"
           >
             <Button
+              onClick={() => {
+                const p = game.players[index];
+                game.points(p, PA.addN, 1);
+                setTimeout(() => {
+                  if (p.negativePoints > 2) {
+                    game.playerLost(p);
+                  } else {
+                    setIndex((index + 1) % game.players.length);
+                  }
+                }, 1500);
+              }}
               margin="2px"
               style={{
                 borderRadius: 4,
@@ -121,9 +136,19 @@ export default function Moelkky() {
               <Box height={window.innerWidth / 4 - 3 + "px"}>
                 <Button
                   onClick={() => {
-                    game.points(game.players[index], PA.addP, v + 1);
+                    const p = game.players[index];
+                    const ps = p.points + v + 1;
+                    if (ps > 50) {
+                      game.points(p, PA.setP, 25);
+                    } else {
+                      game.points(p, PA.addP, v + 1);
+                    }
                     setTimeout(() => {
-                      setIndex((index + 1) % game.players.length);
+                      if (ps === 50) {
+                        game.playerWon(p);
+                      } else {
+                        setIndex((index + 1) % game.players.length);
+                      }
                     }, 500);
                   }}
                   fill
