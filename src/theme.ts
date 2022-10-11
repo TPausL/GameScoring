@@ -318,10 +318,6 @@ const theme = {
       width: "2px",
       radius: "18px",
     },
-    padding: {
-      vertical: "4px",
-      horizontal: "22px",
-    },
   },
   checkBox: {
     check: {

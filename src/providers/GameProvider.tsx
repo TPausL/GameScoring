@@ -65,9 +65,7 @@ export default function GameContextProvider({
   };
 
   const reset = () => {
-    console.log(activePlayers, wonPlayers, lostPlayers);
     const ps = [...activePlayers, ...wonPlayers, ...lostPlayers];
-    console.log(ps);
     setWonPlayers([]);
     setLostPlayers([]);
     forEach(ps, (p) => p.reset());
@@ -76,6 +74,7 @@ export default function GameContextProvider({
         sortedIds.current.indexOf(a.id) - sortedIds.current.indexOf(b.id)
     );
     setCurPlayer(ps[0]);
+    console.log(ps);
     setPlayers(ps);
   };
 

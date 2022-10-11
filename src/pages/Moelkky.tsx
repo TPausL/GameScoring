@@ -16,27 +16,36 @@ import PlayerSlide from "../components/PlayerSlide";
 import Carousel from "nuka-carousel";
 
 import "./slider.css";
-import WinModal from "../components/WinModal";
+import EndModal from "../components/EndModal";
 import { Box, Button, Grid, Main, Text } from "grommet";
-import { range } from "lodash";
+import { filter, pick, range } from "lodash";
 import tinycolor from "tinycolor2";
 import { Edit, FormNext, FormPrevious, Launch, Next } from "grommet-icons";
+import WinModal from "../components/WinModal";
 
 export default function Moelkky() {
   const game = useContext(GameContext);
-  const [ap, setAp] = useState<Player>(game.players[0]);
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [endModalOpen, setEndModalOpen] = useState<boolean>(false);
+  const [winModalData, setWinModalData] = useState<{
+    player: Player;
+    open: boolean;
+    reason: string;
+    won: boolean;
+    remaining: Player[];
+  }>({
+    player: new Player({ color: "red", id: "0", name: "Default" }),
+    open: false,
+    reason: "",
+    won: false,
+    remaining: [],
+  });
 
   const [index, setIndex] = useState<number>(0);
-  useEffect(() => {
-    setAp(game.players[index]);
-  }, [index]);
 
   useEffect(() => {
-    if (game.players.length <= 1) {
-      setModalOpen(true);
-    }
-  }, [game.players]);
+    console.log(index);
+  }, [index]);
+
   return (
     <>
       <Main
@@ -107,6 +116,18 @@ export default function Moelkky() {
                 game.points(p, PA.addN, 1);
                 setTimeout(() => {
                   if (p.negativePoints > 2) {
+                    if (game.players.length > 1) {
+                      setWinModalData({
+                        player: p,
+                        open: true,
+                        reason: "Three attempts to hit a pin failed.",
+                        won: false,
+                        remaining: filter(game.players, (pl) => pl.id !== p.id),
+                      });
+                    } else {
+                      setEndModalOpen(true);
+                    }
+
                     game.playerLost(p);
                   } else {
                     setIndex((index + 1) % game.players.length);
@@ -133,22 +154,37 @@ export default function Moelkky() {
             columns={{ count: 4, size: "auto" }}
           >
             {range(12).map((v) => (
-              <Box height={window.innerWidth / 4 - 3 + "px"}>
+              <Box key={v} height={window.innerWidth / 4 - 3 + "px"}>
                 <Button
                   onClick={() => {
-                    const p = game.players[index];
+                    console.log(index);
+                    const p = game.players[index] ?? game.players[0];
                     const ps = p.points + v + 1;
                     if (ps > 50) {
                       game.points(p, PA.setP, 25);
-                    } else {
+                    } else if (ps < 50) {
                       game.points(p, PA.addP, v + 1);
+                    } else {
+                      if (game.players.length > 1) {
+                        setWinModalData({
+                          player: p,
+                          open: true,
+                          reason: "The goal of exactly 50 points was reached.",
+                          won: true,
+                          remaining: filter(
+                            game.players,
+                            (pl) => pl.id !== p.id
+                          ),
+                        });
+                      } else {
+                        setEndModalOpen(true);
+                      }
+                      game.playerWon(p);
+                      return;
                     }
                     setTimeout(() => {
-                      if (ps === 50) {
-                        game.playerWon(p);
-                      } else {
-                        setIndex((index + 1) % game.players.length);
-                      }
+                      setIndex((index + 1) % game.players.length);
+                      return;
                     }, 500);
                   }}
                   fill
@@ -161,8 +197,18 @@ export default function Moelkky() {
             ))}
           </Grid>
         </div>
+        <WinModal
+          {...winModalData}
+          onClose={() => {
+            setWinModalData({ ...winModalData, open: false });
+          }}
+        />
+        <EndModal
+          open={endModalOpen}
+          onClose={() => setEndModalOpen(false)}
+          texts={{ win: "Hit 50 points:", lose: "Failed 3 attempts:" }}
+        />
       </Main>
-      <WinModal open={false} />
     </>
   );
 }

@@ -15,3 +15,17 @@ a{
 body{
     letter-spacing: 0.025em;
 }
+
+
+.ReactModal__Content {
+  transform: translateY(100vh);
+  transition: transform 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ReactModal__Content--after-open{
+  transform: translateY(0px);
+}
+
+.ReactModal__Content--before-close{
+   transform: translateY(100vh);
+}

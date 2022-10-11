@@ -74,6 +74,8 @@ const Home: React.FC = () => {
     setPlayers(newPlayers);
     set("players", newPlayers);
   };
+
+  console.log(game.players);
   return (
     <Main
       background="background-back"
@@ -97,7 +99,7 @@ const Home: React.FC = () => {
             key={p.id}
             name={p.name}
             color={p.color}
-            active={includes(activePlayers, p.id)}
+            active={filter(game.players, (pl) => pl.id === p.id).length > 0}
             onClick={() => toggleActive(p.id)}
             onDelete={() => removePlayer(p.id)}
           />

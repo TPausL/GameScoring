@@ -1,51 +1,86 @@
-import { IonItem, IonLabel, IonList, IonModal } from "@ionic/react";
-import { reverse } from "lodash";
-import { useContext, useEffect, useRef } from "react";
-import GameContextProvider, {
-  GameContext,
-  GameContextType,
-} from "../providers/GameProvider";
-
-export default function WinModal({ open }: { open: boolean }) {
-  const modRef = useRef<HTMLIonModalElement>(
-    undefined as unknown as HTMLIonModalElement
-  );
-
-  const game = useContext<GameContextType>(GameContext);
+import React, { useContext, useEffect, useState } from "react";
+import Player from "../providers/Player";
+import Modal from "react-modal";
+import {
+  Box,
+  Button,
+  Heading,
+  List,
+  Text,
+  ThemeContext,
+  ThemeType,
+} from "grommet";
+import { normalizeColor } from "grommet/utils";
+import { Achievement, Close } from "grommet-icons";
+import RawModal from "./RawModal";
+function WinModal({
+  player,
+  reason,
+  won,
+  open,
+  onClose,
+  remaining,
+}: {
+  player: Player;
+  reason: string;
+  won?: boolean;
+  open: boolean;
+  onClose?: () => void;
+  remaining?: Player[];
+}) {
+  const [isOpen, setIsOpen] = useState<boolean>(open);
 
   useEffect(() => {
-    open ? modRef.current?.present() : modRef.current?.dismiss();
+    setIsOpen(open);
   }, [open]);
 
-  let currentPlace = 0;
+  function close() {
+    setIsOpen(false);
+    onClose && onClose();
+  }
+
+  const Icon = won ? Achievement : Close;
+
   return (
-    <IonModal id="winModal" ref={modRef}>
-      <IonList>
-        {game.wonPlayers.map((p) => {
-          currentPlace++;
-          return (
-            <IonItem>
-              <IonLabel>{`${currentPlace} ${p.name}`}</IonLabel>
-            </IonItem>
-          );
-        })}
-        {game.players.map((p) => {
-          currentPlace++;
-          return (
-            <IonItem>
-              <IonLabel>{`${currentPlace} ${p.name}`}</IonLabel>
-            </IonItem>
-          );
-        })}
-        {reverse(game.lostPlayers).map((p) => {
-          currentPlace++;
-          return (
-            <IonItem>
-              <IonLabel>{`${currentPlace} ${p.name}`}</IonLabel>
-            </IonItem>
-          );
-        })}
-      </IonList>
-    </IonModal>
+    <RawModal
+      isOpen={isOpen}
+      icon={Icon}
+      iconProps={{ color: won ? "status-ok" : "status-critical" }}
+    >
+      <Heading color="text">{`${player.name} ${
+        won ? "finished" : "dropped out"
+      }!`}</Heading>
+      <Text style={{ alignSelf: "start" }}>{reason}</Text>
+      {remaining?.length ? (
+        <>
+          <Heading level={3}>
+            Remaing {remaining.length === 1 ? "is" : "are"}:
+          </Heading>
+          <List
+            primaryKey="name"
+            style={{ width: "100%" }}
+            action={(item) => (
+              <Text>
+                {item.points} ({item.negativePoints} fail
+                {item.negativePoints == 1 ? "" : "s"})
+              </Text>
+            )}
+            data={remaining}
+          />
+        </>
+      ) : (
+        <></>
+      )}
+      <Button
+        onClick={close}
+        margin={{ top: "medium" }}
+        style={{ padding: "8px" }}
+        primary
+      >
+        Keep on playing!
+      </Button>
+    </RawModal>
   );
 }
+
+export default WinModal;
