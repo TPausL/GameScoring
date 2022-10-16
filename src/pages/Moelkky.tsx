@@ -177,6 +177,7 @@ export default function Moelkky() {
                           ),
                         });
                       } else {
+                        console.log("endeeee");
                         setEndModalOpen(true);
                       }
                       game.playerWon(p);

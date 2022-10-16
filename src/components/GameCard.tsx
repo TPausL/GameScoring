@@ -1,21 +1,21 @@
-import { Card, CardBody, CardHeader, Heading, Text } from "grommet";
+import { Button, Card, CardBody, CardHeader, Heading, Text } from "grommet";
 import { Icon } from "grommet-icons";
 import { Link } from "react-router-dom";
 import { ReactComponent as Moelkky } from "../icons/Moelkky.svg";
 export default function GameCard({
   name,
   desc,
-  link,
+  onClick,
   ...rest
 }: {
   name: string;
   icon: Icon;
-  link: string;
+  onClick: () => void;
   desc: string;
 }) {
   return (
-    <Link
-      to={link}
+    <Button
+      onClick={onClick}
       style={{ width: "calc(50% - 24px)", margin: 8, minHeight: "15vh" }}
     >
       <Card
@@ -43,6 +43,6 @@ export default function GameCard({
           <Text color="text-weak">{desc}</Text>
         </CardBody>
       </Card>
-    </Link>
+    </Button>
   );
 }

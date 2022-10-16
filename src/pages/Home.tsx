@@ -20,26 +20,42 @@ import { add } from "ionicons/icons";
 import PlayerModal from "../components/PlayerModal";
 import { v4 as uuid } from "uuid";
 import { filter } from "lodash";
-import { GameContext } from "../providers/GameProvider";
+import { Game, GameContext } from "../providers/GameProvider";
 import { Box, Button, Grid, Main, Text } from "grommet";
 import { Add, Gamepad, Group, LocationPin } from "grommet-icons";
 import { Divider } from "@react-md/divider";
 import tinycolor from "tinycolor2";
 import GameCard from "../components/GameCard";
+import PlayerCountModal from "../components/PlayerCountModal";
+import { useNavigate } from "react-router";
 export interface Player {
   name: string;
   color: string;
   id: string;
 }
+
 const Home: React.FC = () => {
   const [players, setPlayers] = useState<
     { name: string; id: string; color: string }[]
   >([]);
   const [activePlayers, setActivePlayers] = useState<string[]>([]);
-
+  const navigate = useNavigate();
   const game = useContext(GameContext);
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [playerCountData, setPlayerCountData] = useState<{
+    isOpen: boolean;
+    max?: number;
+    min?: number;
+    cur: number;
+    game: string;
+  }>({
+    isOpen: false,
+    cur: 0,
+    max: 1,
+    min: 1,
+    game: "",
+  });
 
   useEffect(() => {
     get("players").then((p: Player[]) => {
@@ -75,7 +91,27 @@ const Home: React.FC = () => {
     set("players", newPlayers);
   };
 
-  console.log(game.players);
+  const startGame = (selection: Game) => {
+    if (selection === Game.Moelkky) {
+      if (game.players.length < 1) {
+        setPlayerCountData({
+          isOpen: true,
+          min: 1,
+          cur: game.players.length,
+          game: "Moelkky",
+        });
+      } else {
+        switch (selection) {
+          case Game.Moelkky:
+            navigate("moelkky");
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+  };
   return (
     <Main
       background="background-back"
@@ -137,13 +173,13 @@ const Home: React.FC = () => {
           desc="Throw pin at other pins"
           name="Moelkky"
           icon={LocationPin}
-          link="moelkky"
+          onClick={() => startGame(Game.Moelkky)}
         />
         <GameCard
           desc="Throw pin at othe"
           name="Moelkky"
           icon={LocationPin}
-          link="moelkky"
+          onClick={() => ""}
         />
       </Box>
       <PlayerModal
@@ -151,6 +187,7 @@ const Home: React.FC = () => {
         onConfirm={addPlayer}
         onClose={() => setModalOpen(false)}
       />
+      <PlayerCountModal {...playerCountData} />
     </Main>
   );
 };

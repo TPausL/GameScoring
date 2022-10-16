@@ -19,7 +19,6 @@ import Settings from "./pages/Settings";
 import Moelkky from "./pages/Moelkky";
 import GameContextProvider from "./providers/GameProvider";
 import { Grommet, Nav } from "grommet";
-import { Configure, HomeRounded, History as HistoryIcon } from "grommet-icons";
 import theme from "./theme";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { Navigate } from "react-router";

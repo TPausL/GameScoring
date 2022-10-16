@@ -91,7 +91,7 @@ export default function EndModal({
           label={"Restart"}
           onClick={() => {
             game.reset();
-            setIsOpen(false);
+            close();
           }}
         />
         <Button

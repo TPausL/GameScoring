@@ -13,6 +13,12 @@ export enum PA {
   setN,
 }
 
+export enum Game {
+  Moelkky,
+  Doppelkopf,
+  SechsNimmt,
+}
+
 export type GameContextType = {
   setPlayers: (ps: RawPlayer[]) => void;
   players: Player[];
