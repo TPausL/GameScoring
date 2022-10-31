@@ -1,18 +1,29 @@
 import { Button, Card, CardBody, CardHeader, Heading, Text } from "grommet";
-import { Icon } from "grommet-icons";
+import { Icon as IconDef } from "grommet-icons";
 import { Link } from "react-router-dom";
-import { ReactComponent as Moelkky } from "../icons/Moelkky.svg";
 export default function GameCard({
   name,
   desc,
+  Icon,
   onClick,
+  iconProps,
   ...rest
 }: {
   name: string;
-  icon: Icon;
+  Icon: React.FunctionComponent<
+    React.SVGProps<SVGSVGElement> & { title?: string }
+  >;
   onClick: () => void;
   desc: string;
+  iconProps?: React.SVGProps<SVGSVGElement> & { title?: string };
 }) {
+  let iconStyle,
+    iconRest = {};
+  if (iconProps) {
+    const { style, ...rest } = iconProps;
+    iconStyle = style;
+    iconRest = rest;
+  }
   return (
     <Button
       onClick={onClick}
@@ -24,7 +35,7 @@ export default function GameCard({
         background="secondary"
         style={{ position: "relative" }}
       >
-        <Moelkky
+        <Icon
           style={{
             position: "absolute",
             top: "2vw",
@@ -32,9 +43,11 @@ export default function GameCard({
             zIndex: 10,
             opacity: 0.5,
             width: "7vh",
+            ...iconStyle,
           }}
           fill="#BF1363"
           stroke="#CCCCCC"
+          {...iconRest}
         />
         <CardHeader style={{ zIndex: 11 }}>
           <Heading level={3}>{name}</Heading>

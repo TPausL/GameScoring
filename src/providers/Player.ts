@@ -6,6 +6,7 @@ export default class Player implements RawPlayer {
   private _id: string;
   points: number = 0;
   negativePoints: number = 0;
+  wins: number = 0;
 
   constructor(p: RawPlayer) {
     this._id = p.id;

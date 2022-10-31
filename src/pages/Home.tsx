@@ -28,6 +28,8 @@ import tinycolor from "tinycolor2";
 import GameCard from "../components/GameCard";
 import PlayerCountModal from "../components/PlayerCountModal";
 import { useNavigate } from "react-router";
+import { ReactComponent as MoelkkyIcon } from "../icons/Moelkky.svg";
+import { ReactComponent as Take6Icon } from "../icons/Take6.svg";
 export interface Player {
   name: string;
   color: string;
@@ -92,24 +94,31 @@ const Home: React.FC = () => {
   };
 
   const startGame = (selection: Game) => {
-    if (selection === Game.Moelkky) {
-      if (game.players.length < 1) {
-        setPlayerCountData({
-          isOpen: true,
-          min: 1,
-          cur: game.players.length,
-          game: "Moelkky",
-        });
-      } else {
-        switch (selection) {
-          case Game.Moelkky:
-            navigate("moelkky");
-            break;
-
-          default:
-            break;
+    switch (selection) {
+      case Game.Moelkky:
+        if (game.players.length < 1) {
+          setPlayerCountData({
+            isOpen: true,
+            min: 1,
+            cur: game.players.length,
+            game: "Moelkky",
+          });
+        } else {
+          navigate("moelkky");
         }
-      }
+        break;
+      case Game.TakeSix:
+        if (game.players.length < 2) {
+          setPlayerCountData({
+            isOpen: true,
+            min: 2,
+            cur: game.players.length,
+            game: "Take 6!",
+          });
+        } else {
+          navigate("takesix");
+        }
+        break;
     }
   };
   return (
@@ -170,16 +179,17 @@ const Home: React.FC = () => {
       </Box>
       <Box wrap width="100%" direction="row" justify="center">
         <GameCard
-          desc="Throw pin at other pins"
+          desc="Throw a pin at other pins"
           name="Moelkky"
-          icon={LocationPin}
+          Icon={MoelkkyIcon}
           onClick={() => startGame(Game.Moelkky)}
         />
         <GameCard
-          desc="Throw pin at othe"
-          name="Moelkky"
-          icon={LocationPin}
-          onClick={() => ""}
+          desc="Take the 6th card"
+          name="Take 6!"
+          Icon={Take6Icon}
+          iconProps={{ fill: "#ccc" }}
+          onClick={() => startGame(Game.TakeSix)}
         />
       </Box>
       <PlayerModal
@@ -187,7 +197,12 @@ const Home: React.FC = () => {
         onConfirm={addPlayer}
         onClose={() => setModalOpen(false)}
       />
-      <PlayerCountModal {...playerCountData} />
+      <PlayerCountModal
+        {...playerCountData}
+        onClose={() =>
+          setPlayerCountData({ ...playerCountData, isOpen: false })
+        }
+      />
     </Main>
   );
 };

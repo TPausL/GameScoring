@@ -15,8 +15,7 @@ export enum PA {
 
 export enum Game {
   Moelkky,
-  Doppelkopf,
-  SechsNimmt,
+  TakeSix,
 }
 
 export type GameContextType = {
@@ -28,6 +27,7 @@ export type GameContextType = {
   playerLost: (p: Player) => void;
   wonPlayers: Player[];
   playerWon: (p: Player) => void;
+  winCount: (p: Player) => void;
 };
 export const GameContext = createContext<GameContextType>({
   setPlayers: () => undefined,
@@ -38,6 +38,7 @@ export const GameContext = createContext<GameContextType>({
   wonPlayers: [],
   playerWon: () => undefined,
   points: () => undefined,
+  winCount: () => undefined,
 });
 
 export default function GameContextProvider({
@@ -85,7 +86,6 @@ export default function GameContextProvider({
   };
 
   const points = (player: Player, action: PA, points: number) => {
-    console.log(activePlayers.indexOf(player));
     if (activePlayers.indexOf(player) < 0) return;
     switch (action) {
       case PA.setP:
@@ -126,6 +126,14 @@ export default function GameContextProvider({
     setWonPlayers([...wonPlayers, p]);
   };
 
+  const winCount = (player: Player) => {
+    player.wins++;
+    const index = activePlayers.indexOf(player);
+    const newPlayers = [...filter(activePlayers, (p) => p.id !== player.id)];
+    newPlayers.splice(index, 0, player);
+    setActivePlayers(newPlayers);
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -137,6 +145,7 @@ export default function GameContextProvider({
         wonPlayers,
         playerWon,
         points,
+        winCount,
       }}
     >
       {children}

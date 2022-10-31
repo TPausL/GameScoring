@@ -28,6 +28,7 @@ import Header from "./components/Header";
 import "./App.css";
 import "react-spring-bottom-sheet/dist/style.css";
 import Tabs from "./components/Tabs";
+import TakeSix from "./pages/TakeSix";
 
 setupIonicReact();
 const App: React.FC = () => (
@@ -52,6 +53,7 @@ const App: React.FC = () => (
                     <Routes>
                       <Route path="" element={<Home />} />
                       <Route path="moelkky" element={<Moelkky />} />
+                      <Route path="takesix" element={<TakeSix />} />
                     </Routes>
                   </>
                 }
